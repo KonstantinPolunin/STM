@@ -4,9 +4,9 @@ package com.stm.tickets.repository;
 import com.stm.tickets.models.Rout;
 import com.stm.tickets.models.Ticket;
 import com.stm.tickets.models.Transporter;
-import com.stm.tickets.util.Util;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +14,13 @@ import java.util.List;
 
 @Repository
 public class TicketRepositoryImpl implements TicketRepository {
+    private final DataSource dataSource;
+
+    public TicketRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+
     @Override
     public List<Ticket> findAvailableTickets(String departure, String destination, String transporter,
                                              LocalDateTime time, int page, int size) {
@@ -38,7 +45,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
         sql += " LIMIT ? OFFSET ?";
 
-        try (Connection connection = Util.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
 
@@ -92,7 +99,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public void buyTicket(Long ticketId, Long userId) {
         String sql = "UPDATE stm.tickets SET is_bought = TRUE, user_id = ? WHERE id = ? AND is_bought = FALSE";
-        try (Connection connection = Util.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(2, ticketId);
             statement.setLong(1, userId);
@@ -106,7 +113,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public Ticket findById(Long id) {
         String sql = "select * from stm.tickets where id = ?";
-        try (Connection connection = Util.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -135,7 +142,7 @@ public class TicketRepositoryImpl implements TicketRepository {
         String sql = "SELECT * FROM stm.tickets t" +
                 " WHERE t.is_bought = true AND t.user_id = ?";
 
-        try (Connection connection = Util.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, userId);
 
@@ -158,7 +165,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public void deleteTicket(Long id) {
         String sql = "DELETE FROM stm.tickets WHERE id = ?";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
@@ -171,7 +178,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public void updateTicket(Long id, Ticket ticket) {
         String sql = "UPDATE stm.tickets SET rout_id = ?, time = ?, seat = ?, price = ? WHERE id = ?";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(5, ticket.getId());
             statement.setLong(1, ticket.getRout().getId());
@@ -188,7 +195,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public void addTicket(Ticket ticket) {
         String sql = "insert into stm.tickets (id, rout_id ,time, seat, price) values (?, ?, ?, ?, ?)";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, ticket.getId());
             statement.setLong(2, ticket.getRout().getId());

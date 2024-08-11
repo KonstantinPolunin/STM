@@ -1,8 +1,8 @@
 package com.stm.tickets.repository;
 
-import com.stm.tickets.util.Util;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,11 +12,17 @@ import java.util.List;
 
 @Repository
 public class RoleRepositoryImpl implements RoleRepository {
+    private final DataSource dataSource;
+
+    public RoleRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public List<String> findAllRoles() {
         List<String> roles = new ArrayList<>();
         String sql = "SELECT name FROM stm.roles";
-        try (Connection connection = Util.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {

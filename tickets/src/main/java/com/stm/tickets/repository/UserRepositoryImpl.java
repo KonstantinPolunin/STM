@@ -1,9 +1,9 @@
 package com.stm.tickets.repository;
 
 import com.stm.tickets.models.User;
-import com.stm.tickets.util.Util;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,10 +12,16 @@ import java.sql.SQLException;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
+    private final DataSource dataSource;
+
+    public UserRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public void registerUser(User user) {
         String sql = "insert into stm.users (first_name, last_name, login, password) values (?, ?, ?, ?)";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, user.getFirstName());
                 statement.setString(2, user.getLastName());
@@ -32,7 +38,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findUserByLogin(String login) {
         String sql = "select * from stm.users where login = ?";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
         PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, login);
             try(ResultSet resultSet = statement.executeQuery()) {
@@ -55,7 +61,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean isAdmin(String login) {
         String query = "SELECT r.name FROM stm.users u JOIN stm.roles r ON u.role_id = r.id WHERE u.login = ?";
-        try (Connection connection = Util.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, login);
             try (ResultSet rs = stmt.executeQuery()) {

@@ -1,19 +1,25 @@
 package com.stm.tickets.repository;
 
 import com.stm.tickets.models.Rout;
-import com.stm.tickets.util.Util;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 @Repository
 public class RoutRepositoryImpl implements RoutRepository {
+    private final DataSource dataSource;
+
+    public RoutRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public void addRout(Rout rout) {
         String sql = "insert into stm.routs (id, departure ,destination, duration, transporter_id) values (?, ?, ?, ?, ?)";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, rout.getId());
             statement.setString(2, rout.getDeparture());
@@ -31,7 +37,7 @@ public class RoutRepositoryImpl implements RoutRepository {
     @Override
     public void updateRout(Long id, Rout rout) {
         String sql = "UPDATE stm.routs SET departure = ?, destination = ?, duration = ?, transporter_id = ? WHERE id = ?";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(5, rout.getId());
             statement.setString(1, rout.getDeparture());
@@ -50,7 +56,7 @@ public class RoutRepositoryImpl implements RoutRepository {
     @Override
     public void deleteRout(Long id) {
         String sql = "DELETE FROM stm.routs WHERE id = ?";
-        try(Connection connection = Util.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();

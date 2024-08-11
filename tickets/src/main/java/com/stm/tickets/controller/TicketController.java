@@ -30,12 +30,14 @@ public class TicketController {
                                             @RequestParam(defaultValue = "10") int size) {
         return ticketService.findAvailableTickets(departure, destination, transporter, time, page, size);
     }
+
     @ApiOperation(value = "Покупка билетов пользователем")
     @PostMapping("/{ticketId}/buy")
     @ResponseStatus(HttpStatus.CREATED)
     public void purchaseTicket(@PathVariable Long ticketId, @RequestParam Long userId) {
         ticketService.buyTicket(ticketId, userId);
     }
+
     @ApiOperation(value = "Get user's tickets ")
     @GetMapping("/purchase")
     public List<Ticket> getTicketsByUserId(@RequestParam Long userId) {

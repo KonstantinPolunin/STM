@@ -60,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean isAdmin(String login) {
-        String query = "SELECT r.name FROM stm.users u JOIN stm.roles r ON u.role_id = r.id WHERE u.login = ?";
+        String query = "SELECT r.role FROM stm.users u JOIN stm.roles r ON u.role_id = r.id WHERE u.login = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, login);

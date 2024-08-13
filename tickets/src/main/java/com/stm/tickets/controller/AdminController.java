@@ -3,16 +3,19 @@ package com.stm.tickets.controller;
 import com.stm.tickets.models.Rout;
 import com.stm.tickets.models.Ticket;
 import com.stm.tickets.models.Transporter;
+import com.stm.tickets.models.User;
 import com.stm.tickets.service.RoutService;
 import com.stm.tickets.service.TicketService;
 import com.stm.tickets.service.TransporterService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+/*import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;*/
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "Контроллер админа")
+import java.util.List;
+
+//@Api(tags = "Контроллер админа")
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -28,7 +31,12 @@ public class AdminController {
         this.transporterService = transporterService;
     }
 
-    @ApiOperation(value = "Добавление билета")
+    @GetMapping
+    public ResponseEntity<String> adminPage() {
+        return ResponseEntity.ok("Admin page");
+    }
+
+    //@ApiOperation(value = "Добавление билета")
     @PostMapping("/tickets")
     public ResponseEntity<String> addTicket(@RequestBody Ticket ticket) {
         try {
@@ -39,7 +47,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Изменение существующего билета")
+    //@ApiOperation(value = "Изменение существующего билета")
     @PutMapping("/tickets/{id}")
     public ResponseEntity<String> updateTicket(@PathVariable Long id, @RequestBody Ticket ticket) {
         try {
@@ -50,7 +58,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Удаление билета")
+    //@ApiOperation(value = "Удаление билета")
     @DeleteMapping("/tickets/{id}")
     public ResponseEntity<String> deleteTicket(@PathVariable Long id) {
         try {
@@ -61,7 +69,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Добавление маршрута")
+    //@ApiOperation(value = "Добавление маршрута")
     @PostMapping("/routes")
     public ResponseEntity<String> addRout(@RequestBody Rout rout) {
         try {
@@ -72,7 +80,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Изменение существующего маршрута")
+    //@ApiOperation(value = "Изменение существующего маршрута")
     @PutMapping("/routes/{id}")
     public ResponseEntity<String> updateRout(@PathVariable Long id, @RequestBody Rout rout) {
         try {
@@ -83,7 +91,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Удаление маршрута")
+    //@ApiOperation(value = "Удаление маршрута")
     @DeleteMapping("/routes/{id}")
     public ResponseEntity<String> deleteRout(@PathVariable Long id) {
         try {
@@ -94,7 +102,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Добавление нового перевозчика")
+    //@ApiOperation(value = "Добавление нового перевозчика")
     @PostMapping("/carriers")
     public ResponseEntity<String> addTransporter(@RequestBody Transporter transporter) {
         try {
@@ -105,7 +113,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Изменение существующего перевозчика")
+    //@ApiOperation(value = "Изменение существующего перевозчика")
     @PutMapping("/carriers/{id}")
     public ResponseEntity<String> updateTransporter(@PathVariable Long id, @RequestBody Transporter transporter) {
         try {
@@ -116,7 +124,7 @@ public class AdminController {
         }
     }
 
-    @ApiOperation(value = "Удаление перевозчика")
+    //@ApiOperation(value = "Удаление перевозчика")
     @DeleteMapping("/carriers/{id}")
     public ResponseEntity<String> deleteCarrier(@PathVariable Long id) {
         try {

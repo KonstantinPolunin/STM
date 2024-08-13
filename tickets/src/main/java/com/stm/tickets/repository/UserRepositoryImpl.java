@@ -1,5 +1,6 @@
 package com.stm.tickets.repository;
 
+import com.stm.tickets.models.Role;
 import com.stm.tickets.models.User;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -44,10 +47,12 @@ public class UserRepositoryImpl implements UserRepository {
             try(ResultSet resultSet = statement.executeQuery()) {
                 if(resultSet.next()) {
                     User user = new User();
-                    user.setLogin(resultSet.getString("login"));
+                    user.setId(resultSet.getLong("id"));
                     user.setFirstName(resultSet.getString("first_name"));
                     user.setLastName(resultSet.getString("last_name"));
+                    user.setLogin(resultSet.getString("login"));
                     user.setPassword(resultSet.getString("password"));
+                    user.setRoles(findRolesByUserId(user.getId()));
                     return user;
                 }
             }
@@ -57,21 +62,23 @@ public class UserRepositoryImpl implements UserRepository {
         }
         return null;
     }
-
-    @Override
-    public boolean isAdmin(String login) {
-        String query = "SELECT r.role FROM stm.users u JOIN stm.roles r ON u.role_id = r.id WHERE u.login = ?";
+    private Set<Role> findRolesByUserId(Long userId) {
+        Set<Role> roles = new HashSet<>();
+        String sql = "SELECT r.* FROM stm.roles r JOIN stm.user_roles ur ON r.id = ur.role_id WHERE ur.user_id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, login);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return "ROLE_ADMIN".equals(rs.getString("name"));
-                }
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, userId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Role role = new Role();
+                role.setId(rs.getInt("id"));
+                role.setRole(rs.getString("role"));
+                roles.add(role);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-        return false;
+        return roles;
     }
+
 }

@@ -21,7 +21,7 @@ public class RoleRepositoryImpl implements RoleRepository {
     @Override
     public List<String> findAllRoles() {
         List<String> roles = new ArrayList<>();
-        String sql = "SELECT name FROM stm.roles";
+        String sql = "SELECT role FROM stm.roles";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
